@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+  <!-- Console launch prefix -->
+  <arg name="launch_prefix" default=""/>
+  <arg name="main_cam" default="2" />
+  <arg name="microsoft_cam" default="3" />
+  <arg name="logitech_cam" default="1" />
+ 
+
+  <!-- Config and weights folder. -->
+  <arg name="yolo_weights_path"          default="$(find darknet_ros)/yolo_network_config/weights"/>
+  <arg name="yolo_config_path"           default="$(find darknet_ros)/yolo_network_config/cfg"/>
+
+  <!-- Load parameters -->
+  <rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/ros.yaml"/>
+  <rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/faces.yaml"/>
+
+  <!-- Start darknet and ros wrapper -->
+  <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="screen" launch-prefix="$(arg launch_prefix)">
+    <param name="weights_path"          value="$(arg yolo_weights_path)" />
+    <param name="config_path"           value="$(arg yolo_config_path)" />
+  </node>
+
+         <node pkg="cv_camera" type="cv_camera_node" name="main_camera">
+                <param name="/device_id" value="$(arg main_cam)" />
+                <param name="/rate" value="30" />
+                <param name="/image_width" value="640" />
+                <param name="/image_height" value="480" />
+         </node>
+        <node pkg="cv_camera" type="cv_camera_node" name="side1_camera">
+                <param name="/device_id" value="$(arg microsoft_cam)" />
+                <param name="/rate" value="30" />
+                <param name="/image_width" value="320" />
+                <param name="/image_height" value="240" />
+         </node>
+        <node pkg="cv_camera" type="cv_camera_node" name="side2_camera">
+                <param name="/device_id" value="$(arg logitech_cam)" />
+                <param name="/rate" value="30" />
+                <param name="/image_width" value="320" />
+                <param name="/image_height" value="240" />
+
+         </node>
+
+ <node pkg="rosaria" type="RosAria" name="RosAria" />
+
+<node pkg="take_picture" type="take_picture_node.py" name="take_picture" />
+<node pkg="join_cameras" type="join.py" name="join"/>
+ <!--<node name="republish" type="republish" pkg="image_transport" output="screen" 	args="compressed in:=/front_camera/image_raw raw out:=/camera/image_raw" /> -->
+</launch>

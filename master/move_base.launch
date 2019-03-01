@@ -1,0 +1,17 @@
+<launch>
+
+   <master auto="start"/>
+    <include file="/home/nvidia/catkin_ws/src/master/camera.launch" />
+ <!--- Run AMCL --> 
+    <include file="$(find amcl)/examples/amcl_omni.launch" />
+
+   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find 2dnav)/costmap_common.yaml" command="load" ns="global_costmap" /> 
+    <rosparam file="$(find 2dnav)/costmap_common.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find 2dnav)/local_cost.yaml" command="load" />
+    <rosparam file="$(find 2dnav)/global_cost.yaml" command="load" /> 
+    <rosparam file="$(find 2dnav)/base_local_planner_params.yaml" command="load" />
+    <remap from="cmd_vel" to="RosAria/cmd_vel" />
+ </node>
+
+</launch>
